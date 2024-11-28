@@ -11,25 +11,30 @@ import {HttpTokenInterceptor} from './services/interceptor/http-token.intercepto
 import { ActivateAccountComponent } from './pages/activate-account/activate-account.component';
 import {CodeInputModule} from 'angular-code-input';
 import {KeycloakService} from './services/keycloak/keycloak.service';
+import {ApiModule} from "./services/api.module";
+
 
 export function kcFactory(kcService: KeycloakService) {
   return () => kcService.init();
 }
 
 @NgModule({
+  bootstrap: [AppComponent],
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
     ActivateAccountComponent
+
   ],
-    imports: [
-        BrowserModule,
-        AppRoutingModule,
-        FormsModule,
-        HttpClientModule,
-        CodeInputModule
-    ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule,
+    CodeInputModule,
+    ApiModule.forRoot({rootUrl: 'http://141.144.204.231:8088/api/v1'})
+  ],
   providers: [
     HttpClient,
     {
@@ -44,7 +49,6 @@ export function kcFactory(kcService: KeycloakService) {
       multi: true
     }
 
-  ],
-  bootstrap: [AppComponent]
+  ]
 })
 export class AppModule { }

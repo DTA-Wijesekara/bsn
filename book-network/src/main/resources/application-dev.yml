@@ -34,6 +34,14 @@ spring:
         jwt:
           issuer-uri: "http://localhost:9090/realms/book-social-network"
 application:
+  security:
+    jwt:
+      secret-key: 404E
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+    cors:
+      origins: http://localhost:4200,http://localhost:8080,http://141.144.204.231:8088,http://141.144.204.231:8080
   file:
     uploads:
       photos-output-path: ./uploads
