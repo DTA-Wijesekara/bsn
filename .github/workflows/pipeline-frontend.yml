@@ -52,25 +52,25 @@ jobs:
           steps:
             - name: Create deployment folder
               run: |
-                sudo mkdir -p ~/.ssh
-                sudo ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-                sudo chmod 644 ~/.ssh/known_hosts
-                sudo ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
+                mkdir -p ~/.ssh
+                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+                chmod 644 ~/.ssh/known_hosts
+                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
 
             - name: Copy docker-compose file
               run: |
-                sudo mkdir -p ~/.ssh
-                sudo ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-                sudo chmod 644 ~/.ssh/known_hosts
-                sudo scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
+                mkdir -p ~/.ssh
+                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+                chmod 644 ~/.ssh/known_hosts
+                scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
 
             - name: Set ENV variables and deploy
               run: |
                 mkdir -p ~/.ssh
-                sudo ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-                sudo chmod 644 ~/.ssh/known_hosts
-                sudo ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
+                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+                chmod 644 ~/.ssh/known_hosts
+                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
                 cd ci-cd
-                sudo docker-compose -f docker-compose.yml pull -q
-                sudo docker-compose -f docker-compose.yml up -d
+                docker-compose -f docker-compose.yml pull -q
+                docker-compose -f docker-compose.yml up -d
                 EDF
