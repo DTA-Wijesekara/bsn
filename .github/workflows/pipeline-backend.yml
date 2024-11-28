@@ -20,6 +20,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Grant execute permissions to mvnw
+        run: chmod +x book-network/mvnw
+
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
