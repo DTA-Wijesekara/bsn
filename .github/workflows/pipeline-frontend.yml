@@ -23,7 +23,8 @@ jobs:
           id: extract_version
           run: |
             cd book-network-ui
-            apt-get install jq
+            sudo apt-get update
+            sudo apt-get install jq
             echo "VERSION=$(jq -r '.version' package.json)" >> $GITHUB_OUTPUT
 
         - name: Login to DockerHub
@@ -50,15 +51,15 @@ jobs:
           needs: [ build-image ]
           steps:
             - name: Create deployment folder
-              run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
+              run: sudo ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
 
             - name: Copy docker-compose file
-              run: scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
+              run: sudo scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
 
             - name: Set ENV variables and deploy
               run: |
-                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
+                sudo ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
                 cd ci-cd
-                docker-compose -f docker-compose.yml pull -q
-                docker-compose -f docker-compose.yml up -d
+                sudo docker-compose -f docker-compose.yml pull -q
+                sudo docker-compose -f docker-compose.yml up -d
                 EDF

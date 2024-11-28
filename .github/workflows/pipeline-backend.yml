@@ -107,23 +107,28 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & Push to DockerHub
-        uses: docker/build-push-action@v5
-        with:
-          context: book-network
-          file: docker/backend/Dockerfile
-          push: true
-          platforms: linux/amd64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:${{ steps.extract_version.outputs.VERSION }},${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:latest
-          build-args: |
-            PROFILE=dev
-            APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
+        run: |
+          sudo docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:${{ steps.extract_version.outputs.VERSION }} -t ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:latest .
+          sudo docker push ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:${{ steps.extract_version.outputs.VERSION }}
+          sudo docker push ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:latest
+#        uses: docker/build-push-action@v5
+#        with:
+#          context: book-network
+#          file: docker/backend/Dockerfile
+#          push: true
+#          platforms: linux/amd64
+#          tags: ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:${{ steps.extract_version.outputs.VERSION }},${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:latest
+#          build-args: |
+#            PROFILE=dev
+#            APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
+
   deploy:
     name: Deploy Backend
     runs-on: ubuntu-latest
     needs: [build-image]
     steps:
       - name: Create deployment folder
-        run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
+        run: ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "sudo mkdir -p ci-cd"
 
       - name: Copy docker-compose file
         run: scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
@@ -132,6 +137,6 @@ jobs:
         run: |
           ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
           cd ci-cd
-          docker-compose -f docker-compose.yml pull -q
-          docker-compose -f docker-compose.yml up -d
+          sudo docker-compose -f docker-compose.yml pull -q
+          sudo docker-compose -f docker-compose.yml up -d
           EDF
