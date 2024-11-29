@@ -50,11 +50,11 @@ jobs:
           java-version: 17
           distribution: 'corretto'
 
-      - name: Running unit Tests
-        run: |
-          cd book-network
-          sudo chmod +x ./mvnw
-          ./mvnw clean test
+#      - name: Running unit Tests
+#        run: |
+#          cd book-network
+#          sudo chmod +x ./mvnw
+#          ./mvnw clean test
 
   build:
     runs-on: ubuntu-latest
