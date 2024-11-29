@@ -116,6 +116,7 @@ jobs:
           sudo docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:${{ steps.extract_version.outputs.VERSION }} -t ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:latest .
           sudo docker push ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:${{ steps.extract_version.outputs.VERSION }}
           sudo docker push ${{ secrets.DOCKERHUB_USERNAME }}/bsn-api:latest
+#          dummy
 #        uses: docker/build-push-action@v5
 #        with:
 #          context: book-network
