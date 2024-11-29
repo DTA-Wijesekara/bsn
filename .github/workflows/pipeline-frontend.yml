@@ -44,7 +44,7 @@ jobs:
             build-args: |
               PROFILE=dev
               APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
-
+#dummy
 #    deploy:
 #          name: Deploy Frontend
 #          runs-on: ubuntu-latest
