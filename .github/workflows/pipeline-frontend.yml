@@ -45,32 +45,61 @@ jobs:
               PROFILE=dev
               APP_VERSION=${{ steps.extract_version.outputs.VERSION }}
 
+#    deploy:
+#          name: Deploy Frontend
+#          runs-on: ubuntu-latest
+#          needs: [ build-image ]
+#          steps:
+#            - name: Create deployment folder
+#              run: |
+#                mkdir -p ~/.ssh
+#                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+#                chmod 644 ~/.ssh/known_hosts
+#                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
+#
+#            - name: Copy docker-compose file
+#              run: |
+#                mkdir -p ~/.ssh
+#                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+#                chmod 644 ~/.ssh/known_hosts
+#                scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
+#
+#            - name: Set ENV variables and deploy
+#              run: |
+#                mkdir -p ~/.ssh
+#                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+#                chmod 644 ~/.ssh/known_hosts
+#                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
+#                cd ci-cd
+#                docker-compose -f docker-compose.yml pull -q
+#                docker-compose -f docker-compose.yml up -d
+#                EDF
+
     deploy:
-          name: Deploy Frontend
-          runs-on: ubuntu-latest
-          needs: [ build-image ]
-          steps:
-            - name: Create deployment folder
-              run: |
-                mkdir -p ~/.ssh
-                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-                chmod 644 ~/.ssh/known_hosts
-                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
+      name: Deploy Frontend
+      runs-on: ubuntu-latest
+      needs: [ build-image ]
+      steps:
+        - name: Add VPS to known hosts
+          run: |
+            mkdir -p ~/.ssh
+            echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
+            ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
 
-            - name: Copy docker-compose file
-              run: |
-                mkdir -p ~/.ssh
-                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-                chmod 644 ~/.ssh/known_hosts
-                scp docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
+        - name: Create deployment folder
+          run: |
+            ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} "mkdir -p ci-cd"
 
-            - name: Set ENV variables and deploy
-              run: |
-                mkdir -p ~/.ssh
-                ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts
-                chmod 644 ~/.ssh/known_hosts
-                ssh ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
-                cd ci-cd
-                docker-compose -f docker-compose.yml pull -q
-                docker-compose -f docker-compose.yml up -d
-                EDF
+        - name: Copy docker-compose file
+          run: |
+            scp -i ~/.ssh/id_rsa docker-compose.yml ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:ci-cd/docker-compose.yml
+
+        - name: Set ENV variables and deploy
+          run: |
+            ssh -i ~/.ssh/id_rsa ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} <<EOF
+            cd ci-cd
+            docker-compose -f docker-compose.yml pull -q
+            docker-compose -f docker-compose.yml up -d
+            EOF
